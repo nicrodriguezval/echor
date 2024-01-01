@@ -7,12 +7,12 @@ type TestResult = Result<(), Box<dyn std::error::Error>>;
 const BIN: &'static str = "echor";
 
 fn run(args: &[&str], expected_file: &str) -> TestResult {
-    let expected = fs::read_to_string(expected_file)?; Command::cargo_bin(BIN)?
-    .args(args)
-    .assert()
-    .success()
-    .stdout(expected);
-
+    let expected = fs::read_to_string(expected_file)?;
+    Command::cargo_bin(BIN)?
+        .args(args)
+        .assert()
+        .success()
+        .stdout(expected);
     Ok(())
 }
 
