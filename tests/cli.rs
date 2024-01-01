@@ -6,6 +6,16 @@ type TestResult = Result<(), Box<dyn std::error::Error>>;
 
 const BIN: &'static str = "echor";
 
+fn run(args: &[&str], expected_file: &str) -> TestResult {
+    let expected = fs::read_to_string(expected_file)?; Command::cargo_bin(BIN)?
+    .args(args)
+    .assert()
+    .success()
+    .stdout(expected);
+
+    Ok(())
+}
+
 #[test]
 fn dies_no_args() -> TestResult {
     let mut cmd = Command::cargo_bin(BIN)?;
@@ -16,7 +26,7 @@ fn dies_no_args() -> TestResult {
 }
 
 #[test]
-fn runs() -> TestResult {
+fn basic_test() -> TestResult {
     let mut cmd = Command::cargo_bin(BIN)?;
     cmd
         .arg("-n")
@@ -27,26 +37,20 @@ fn runs() -> TestResult {
 
 #[test]
 fn hello_1() -> TestResult {
-    let outfile = "tests/expected/hello1.txt";
-    let expected = fs::read_to_string(outfile)?;
-    let mut cmd = Command::cargo_bin(BIN)?;
-    cmd
-        .arg("Hello there")
-        .assert()
-        .success()
-        .stdout(expected);
-    Ok(())
+    run(&["Hello there"], "tests/expected/hello1.txt")
+}
+
+#[test]
+fn hello_1_no_newline() -> TestResult {
+    run(&["Hello  there", "-n"], "tests/expected/hello1.n.txt")
 }
 
 #[test]
 fn hello_2() -> TestResult {
-    let outfile = "tests/expected/hello2.txt";
-    let expected = fs::read_to_string(outfile)?;
-    let mut cmd = Command::cargo_bin(BIN)?;
-    cmd
-        .args(&["Hello", "there"])
-        .assert()
-        .success()
-        .stdout(expected);
-    Ok(())
+    run(&["Hello there"], "tests/expected/hello2.txt")
+}
+
+#[test]
+fn hello_2_no_newline() -> TestResult {
+    run(&["Hello", "there", "-n"], "tests/expected/hello2.n.txt")
 }
